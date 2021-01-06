@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-void merge_sort(int first, int last, vector<int>& v) {
+/*void merge_sort(int first, int last, vector<int>& v) {
 	if (first >= last)
 		return;
 
@@ -38,9 +38,9 @@ void merge_sort(int first, int last, vector<int>& v) {
 	for (int i = first; i <= last; i++) {
 		v[i] = tmp[i - first];
 	}
-}
+}*/
 
-/*void quick_sort(int first, int last, vector<int>& v) {
+void quick_sort(int first, int last, vector<int>& v) {
 	if (first <= last)
 		return;
 
@@ -69,7 +69,7 @@ void merge_sort(int first, int last, vector<int>& v) {
 	quick_sort(first, right - 1, v);
 	quick_sort(right+1, last, v);
 
-}*/
+}
 
 int main() {
 	int n;
