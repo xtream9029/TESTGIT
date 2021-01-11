@@ -4,6 +4,8 @@
 #include <iostream>
 using namespace std;
 
+//수정해서 올리는 연습용
+
 /*void merge_sort(int first, int last, vector<int>& v) {
 	if (first >= last)
 		return;
