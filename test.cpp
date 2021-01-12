@@ -8,28 +8,40 @@
 
 using namespace std;
 
-struct Data {
-	int A[3][3];
-	int d;
-};
+void merge_sort(int first, int last, vector<int>& v) {
+	if (first >= last)
+		return;
 
-int firstState[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
-int destState[3][3] = {{1,2,3},{4,5,6},{7,8,0}};
-vector<Data> check;
+	int mid = (first + last) / 2;
 
-int main() {
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			cin >> firstState[i][j];
+	merge_sort(first, mid, v);
+	merge_sort(mid+1, last, v);
+
+	int left = first;
+	int right = mid + 1;
+	vector<int> tmp;
+
+	while (left <= mid && right <= last) {
+		if (v[left] < v[right]) {
+			tmp.push_back(v[left]);
+			left += 1;
+		}
+		else {
+			tmp.push_back(v[right]);
+			right += 1;
 		}
 	}
 
-	queue<Data> q;
+	for (int i = left; i <= mid; i++) {
+		tmp.push_back(v[i]);
+	}
 
+	for (int i = right; i <= last; i++) {
+		tmp.push_back(v[i]);
+	}
 
-
-
-
-
+	for (int i = first; i <= last; i++) {
+		v[i] = tmp[i - first];
+	}
 
 }
