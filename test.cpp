@@ -8,88 +8,83 @@
 
 using namespace std;
 
-//깃허브 테스트
+int n, t, g;
+bool check[100000];
+bool flag = false;
+int answer = 0;
 
-void merge_sort(int first, int last, vector<int>& v) {
-	if (first >= last)
-		return;
+struct Data {
+	int x;
+	int cnt;
+};
 
-	int mid = (first + last) / 2;
-
-	merge_sort(first, mid, v);
-	merge_sort(mid+1, last, v);
-
-	int left = first;
-	int right = mid + 1;
-	vector<int> tmp;
-
-	while (left <= mid && right <= last) {
-		if (v[left] < v[right]) {
-			tmp.push_back(v[left]);
-			left += 1;
+int fun(int x) {
+	x *= 2;
+	vector<int> v;
+	while (x > 0) {
+		v.push_back(x % 10);
+		x /= 10;
+	}
+	
+	for (int i = v.size() - 1; i >= 0; i--) {
+		if (0<v[i]) {
+			v[i]--;
+			break;
 		}
-		else {
-			tmp.push_back(v[right]);
-			right += 1;
-		}
 	}
 
-	for (int i = left; i <= mid; i++) {
-		tmp.push_back(v[i]);
+	int k = 1;
+	int rt = 0;
+	for (int i = 0; i < v.size(); i++) {
+		rt += (k * v[i]);
+		k *= 10;
 	}
-
-	for (int i = right; i <= last; i++) {
-		tmp.push_back(v[i]);
-	}
-
-	for (int i = first; i <= last; i++) {
-		v[i] = tmp[i - first];
-	}
+	return rt;
 }
 
-void quick_sort(int first, int last, vector<int> v) {
-	if (first >= last)
-		return;
+void bfs(int start) {
+	queue<Data> q;
+	check[start] = true;
+	q.push(Data{start,0});
 
-	int pivot = v[first];
-	int left = first + 1;
-	int right = last;
+	while (q.size()) {
+		Data cur = q.front();
+		q.pop();
+		int curNum = cur.x;
+		int curCount = cur.cnt;
 
-	while (left <= right) {
-		while (left <= last && pivot > v[left]) {
-			left += 1;
+		if (curNum == g && curCount <= t) {
+			answer = curCount;
+			flag = true;
+			return;
 		}
-		while (right > first && pivot <= v[right]) {
-			right -= 1;
-		}
-		if (left <= right) {
-			int tmp = v[left];
-			v[left] = v[right];
-			v[right] = tmp;
-		}
-	}
-	int tmp = v[first];
-	v[first] = v[right];
-	v[right] = tmp;
 
-	quick_sort(first, right - 1, v);
-	quick_sort(right+1, last, v);
+		if (curNum+1 < 100000 && curCount<t) {
+			if (check[curNum+1] == false) {
+				check[curNum+1] = true;
+				q.push(Data{curNum+1,curCount+1});
+			}
+		}
+
+		int k = fun(curNum);
+		if (0 <k && k < 100000 && curCount <t) {
+			if (check[k] == false) {
+				check[k] = true;
+				q.push(Data{ k,curCount + 1 });
+			}
+		}
+	}//while
+	return;
 }
+
 
 int main() {
-	int n;
-	cin >> n;
-	vector<int> v;
-	for (int i = 0; i < n; i++) {
-		int x;
-		cin >> x;
-		v.push_back(x);
+	cin >> n >> t >> g;
+	memset(check, false, sizeof(check));
+	bfs(n);
+	if (flag) {
+		cout << answer;
 	}
-
-	merge_sort(0, v.size() - 1, v);
-
-	for (int i = 0; i < v.size(); i++) {
-		cout << v[i] << '\n';
-	}
+	else cout << "ANG";
 	return 0;
 }
