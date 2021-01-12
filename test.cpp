@@ -45,3 +45,21 @@ void merge_sort(int first, int last, vector<int>& v) {
 	}
 
 }
+
+int main() {
+	int n;
+	cin >> n;
+	vector<int> v;
+	for (int i = 0; i < n; i++) {
+		int x;
+		cin >> x;
+		v.push_back(x);
+	}
+
+	merge_sort(0, v.size() - 1, v);
+
+	for (int i = 0; i < v.size(); i++) {
+		cout << v[i] << '\n';
+	}
+	return 0;
+}
