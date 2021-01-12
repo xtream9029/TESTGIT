@@ -43,7 +43,35 @@ void merge_sort(int first, int last, vector<int>& v) {
 	for (int i = first; i <= last; i++) {
 		v[i] = tmp[i - first];
 	}
+}
 
+void quick_sort(int first, int last, vector<int> v) {
+	if (first >= last)
+		return;
+
+	int pivot = v[first];
+	int left = first + 1;
+	int right = last;
+
+	while (left <= right) {
+		while (left <= last && pivot > v[left]) {
+			left += 1;
+		}
+		while (right > first && pivot <= v[right]) {
+			right -= 1;
+		}
+		if (left <= right) {
+			int tmp = v[left];
+			v[left] = v[right];
+			v[right] = tmp;
+		}
+	}
+	int tmp = v[first];
+	v[first] = v[right];
+	v[right] = tmp;
+
+	quick_sort(first, right - 1, v);
+	quick_sort(right+1, last, v);
 }
 
 int main() {
