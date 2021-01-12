@@ -8,6 +8,8 @@
 
 using namespace std;
 
+//깃허브 테스트
+
 void merge_sort(int first, int last, vector<int>& v) {
 	if (first >= last)
 		return;
