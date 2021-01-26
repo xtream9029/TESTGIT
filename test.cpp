@@ -1,121 +1,87 @@
-#include <iostream>
+#include <string>
 #include <vector>
+#include <iostream>
 #include <algorithm>
 #include <queue>
 #include <stack>
-#include <string>
-#include <string.h>
+#include <stdio.h>
 #include <sstream>
+#include <string.h>
 #include <map>
 #include <set>
-#include <cmath>
 using namespace std;
 
-bool check(vector<string> v, string k) {
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i] == k) return false;
+struct Data {
+    int former_x;
+    int former_y;
+    int current_x;
+    int current_y;
+    int cost;
+};
+
+int D[25][25];
+bool check[25][25];
+int dx[4] = { -1,1,0,0 };
+int dy[4] = { 0,0,-1,1 };
+int Min = 987654321;
+
+int bfs(vector<vector<int>> board) {
+    int Size = board.size();
+    queue<Data> q;
+    check[0][0] = true;
+
+    if (board[0][1] == 0) {
+        q.push(Data{ 0,0,0,1,100 });
+        check[0][1] = true;
     }
-    return true;
+    if (board[1][0] == 0) {
+        q.push(Data{ 0,0,1,0,100 });
+        check[1][0] = true;
+    }
+
+    while (q.size()) {
+        Data cur = q.front();
+        q.pop();
+
+        if (cur.current_x == Size - 1 && cur.current_y == Size - 1) {
+            Min = min(Min, cur.cost);
+            D[Size - 1][Size - 1] = Min;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int nx = cur.current_x + dx[i];
+            int ny = cur.current_y + dy[i];
+
+            if (nx < 0 || nx >= Size) continue;
+            if (ny < 0 || ny >= Size) continue;
+
+            if (board[nx][ny] == 0) {
+                int new_cost = cur.cost + 100;
+
+                if (abs(nx - cur.former_x) == 1 && abs(ny - cur.former_y) == 1)
+                    new_cost += 500;
+
+                if (!check[nx][ny]) {
+                    check[nx][ny] = true;
+                    q.push(Data{ cur.current_x,cur.current_y,nx,ny,new_cost });
+                    D[nx][ny] = new_cost;
+                }
+                else {
+                    if (cur.cost <= D[nx][ny]) {
+                        q.push(Data{ cur.current_x,cur.current_y,nx,ny, new_cost });
+                        D[nx][ny] = new_cost;
+                    }
+                }
+            }
+        }//for
+    }//while
+    return D[Size - 1][Size - 1];
 }
 
-bool isExist(vector<string> v, string k) {
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i] == k) return true;
-    }
-    return false;
-}
-
-int solution(string str1, string str2) {
+int solution(vector<vector<int>> board) {
     int answer = 0;
-
-    vector<string> v1;
-    vector<string> v2;
-    vector<string> v;
-
-    double interSize = 0;
-    double unionSize = 0;
-
-    for (int i = 0; i < str1.length() - 1; i++) {
-        char a, b;
-        a = str1[i], b = str1[i + 1];
-
-        if ((a >= 65 && a <= 90 || a >= 97 && a <= 122) && (b >= 65 && b <= 90 || b >= 97 && b <= 122)) {
-            if (a >= 97 && a <= 122) {
-                a -= 32;
-            }
-            if (b >= 97 && b <= 122) {
-                b -= 32;
-            }
-            string tmp = "";
-            tmp += a;
-            tmp += b;
-            v1.push_back(tmp);
-        }
-    }
-
-    for (int i = 0; i < str2.length() - 1; i++) {
-        char a, b;
-        a = str2[i], b = str2[i + 1];
-
-        if ((a >= 65 && a <= 90 || a >= 97 && a <= 122) && (b >= 65 && b <= 90 || b >= 97 && b <= 122)) {
-            if (a >= 97 && a <= 122) {
-                a -= 32;
-            }
-            if (b >= 97 && b <= 122) {
-                b -= 32;
-            }
-            string tmp = "";
-            tmp += a;
-            tmp += b;
-            v2.push_back(tmp);
-        }
-    }
-
-    map<string, int> m1;
-    for (int i = 0; i < v1.size(); i++) {
-        m1[v1[i]] = 0;
-    }
-    map<string, int> m2;
-    for (int i = 0; i < v2.size(); i++) {
-        m2[v2[i]] = 0;
-    }
-
-    for (int i = 0; i < v1.size(); i++) {
-        m1[v1[i]]++;
-    }
-    for (int i = 0; i < v2.size(); i++) {
-        m2[v2[i]]++;
-    }
-
-    map<string, int>::iterator mt1;
-    map<string, int>::iterator mt2;
-
-    for (mt1 = m1.begin(); mt1 != m1.end(); mt1++) {
-        string tmp = mt1->first;
-        int k = mt1->second;
-        for (mt2 = m2.begin(); mt2 != m2.end(); mt2++) {
-            if (tmp == mt2->first) {
-                interSize += double(min(k, mt2->second));
-            }
-        }
-    }
-
-    for (mt1 = m1.begin(); mt1 != m1.end(); mt1++) {
-        unionSize += double(mt1->second);
-    }
-    for (mt2 = m2.begin(); mt2 != m2.end(); mt2++) {
-        unionSize += double(mt2->second);
-    }
-
-    unionSize -= interSize;
-
-    if (unionSize == 0) {
-        answer = 65536;
-    }
-    else {
-        double t;
-        t = (interSize) / unionSize;
-        answer = trunc(t * 65536);
-    }
+    memset(check, false, sizeof(check));
+    memset(D, 0, sizeof(D));
+    answer = bfs(board);
     return answer;
 }
