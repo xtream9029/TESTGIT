@@ -1,84 +1,75 @@
-#include <iostream>
+#include <string>
 #include <vector>
+#include <iostream>
 #include <algorithm>
 #include <queue>
 #include <stack>
-#include <string>
-#include <string.h>
+#include <stdio.h>
 #include <sstream>
-#include <map>
-#include <set>
-#include <cmath>
+#include <string.h>
 using namespace std;
 
-struct pa {
-    int x;
-    int y;
+int dx[4] = { -1,1,0,0 };
+int dy[4] = { 0,0,-1,1};
+bool check[30][30];
+int Map[30][30];
+
+struct node {
+	int x;
+	int y;
 };
 
-bool check(string s, vector<string> v) {
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i] == s) return false;
-    }
-    return true;
-}
+int min_cost = 987654321;
+int n;
 
-vector<int> solution(vector<string> gems){
-    vector<int> answer;
-    set<string> Set;
+//왜 최단거리를 보장해주지 못하는지 이해해야함
+void dfs(int x,int y,vector<node> &v) {
+	if (x == n - 1 && y == n - 1) {
+		int cnt = 0;
+		for (int i = 1; i < v.size()-1; i++) {
+			if (abs(v[i - 1].x - v[i + 1].x) == 1 && abs(v[i - 1].y - v[i + 1].y) == 1) {
+				cnt++;
+			}
+		}
+		int cost = 100 * (v.size() - 1) + 500 * cnt;
+		min_cost = min(cost, min_cost);
+		return;
+	}
 
-    pa ANSWER;
-    for (int i = 0; i < gems.size(); i++) {
-        Set.insert(gems[i]);
-    }
+	for (int i = 0; i <4; i++) {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+		
+		if (nx < 0 || nx >= n) continue;
+		if (ny < 0 || ny >= n) continue;
 
-    int left = 0;
-    int right = 0;
-    int dif = gems.size();
-    int S;
-
-    //투포인터 알고리즘
-    while (left <= right){
-        if (right == gems.size()) break;
-
-        S = right - left+1;
-
-        if (S < Set.size()) {
-            right += 1;
-        }
-        else if (S >= Set.size()) {
-            set<string> A;
-            for (int i = left; i <= right; i++) {
-                A.insert(gems[i]);
-            }
-            if (Set == A){
-                if (S - 1 < dif) {
-                    dif = S - 1;
-                    ANSWER.x = left;
-                    ANSWER.y = right;
-                }
-                left += 1;
-            }
-            else right += 1;
-        }
-    }//while
-
-    answer.push_back(ANSWER.x + 1);
-    answer.push_back(ANSWER.y + 1);
-    return answer;
+		if (Map[nx][ny] == 0) {
+			if (check[nx][ny]) continue;
+			check[nx][ny] = true;
+			v.push_back(node{ nx,ny });
+			dfs(nx, ny, v);
+			v.pop_back();
+			check[nx][ny] = false;
+		}
+	}
 }
 
 int main() {
-    int n;
-    cin >> n;
-    vector<string> v;
-    for (int i = 0; i < n; i++) {
-        string s;
-        cin >> s;
-        v.push_back(s);
-    }
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
 
-    vector<int> rt = solution(v);
-    cout << rt[0] << ' ' << rt[1];
-    return 0;
+	cin >> n;
+	memset(check, false, sizeof(check));
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cin >> Map[i][j];
+		}
+	}
+
+	vector<node> v;
+	v.push_back(node{ 0,0 });
+	dfs(0, 0, v);
+	cout << min_cost;
+	return 0;
 }
