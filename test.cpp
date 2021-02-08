@@ -7,51 +7,61 @@
 #include <stdio.h>
 #include <sstream>
 #include <string.h>
+#include <map>
+#include <set>
 using namespace std;
 
-int dx[4] = { -1,1,0,0 };
-int dy[4] = { 0,0,-1,1};
-bool check[30][30];
-int Map[30][30];
+vector<int> solution(vector<string> v) {
+	vector<int> answer;
+	set<string> s;
+	map<string, int> m;
 
-struct node {
-	int x;
-	int y;
-};
+	for (int i = 0; i < v.size(); i++) {
+		s.insert(v[i]);
+	}
 
-int min_cost = 987654321;
-int n;
+	int left = 0;
+	int right = 0;
+	int ax, ay;//최종 답
+	int dif = v.size() + 100;
 
-//왜 최단거리를 보장해주지 못하는지 이해해야함
-void dfs(int x,int y,vector<node> &v) {
-	if (x == n - 1 && y == n - 1) {
-		int cnt = 0;
-		for (int i = 1; i < v.size()-1; i++) {
-			if (abs(v[i - 1].x - v[i + 1].x) == 1 && abs(v[i - 1].y - v[i + 1].y) == 1) {
-				cnt++;
+	//이중 loop가 없음
+	while (left <= right) {
+		if (right == v.size()) {
+			if (m.size() == s.size()) {
+				if (right - left < dif) {
+					dif = right - left;
+					ax = left + 1, ay = right;
+				}
 			}
+			else break;
 		}
-		int cost = 100 * (v.size() - 1) + 500 * cnt;
-		min_cost = min(cost, min_cost);
-		return;
-	}
 
-	for (int i = 0; i <4; i++) {
-		int nx = x + dx[i];
-		int ny = y + dy[i];
-		
-		if (nx < 0 || nx >= n) continue;
-		if (ny < 0 || ny >= n) continue;
-
-		if (Map[nx][ny] == 0) {
-			if (check[nx][ny]) continue;
-			check[nx][ny] = true;
-			v.push_back(node{ nx,ny });
-			dfs(nx, ny, v);
-			v.pop_back();
-			check[nx][ny] = false;
+		if (m.size() < s.size()){
+			if (m.find(v[right]) != m.end()) {
+				m[v[right]]++;
+			}
+			else {
+				m.insert(make_pair(v[right], 1));
+			}
+			right += 1;
 		}
-	}
+
+		if (m.size() == s.size()) {
+			if (right - left < dif) {
+				dif = right - left;
+				ax = left + 1, ay = right;
+			}
+
+			int k = --m[v[left]];
+			if (k == 0) m.erase(v[left]);
+			left += 1;
+		}
+	}//while
+
+	answer.push_back(ax);
+	answer.push_back(ay);
+	return answer;
 }
 
 int main() {
@@ -59,17 +69,15 @@ int main() {
 	cin.tie(NULL);
 	cout.tie(NULL);
 
+	int n;
 	cin >> n;
-	memset(check, false, sizeof(check));
+	vector<string> v;
 	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cin >> Map[i][j];
-		}
+		string s;
+		cin >> s;
+		v.push_back(s);
 	}
-
-	vector<node> v;
-	v.push_back(node{ 0,0 });
-	dfs(0, 0, v);
-	cout << min_cost;
+	vector<int> ans = solution(v);
+	cout << ans[0] << ' ' << ans[1];
 	return 0;
 }
