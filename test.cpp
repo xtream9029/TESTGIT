@@ -1,83 +1,70 @@
-#include <string>
-#include <vector>
 #include <iostream>
+#include <vector>
 #include <algorithm>
 #include <queue>
 #include <stack>
-#include <stdio.h>
-#include <sstream>
+#include <string>
 #include <string.h>
+#include <sstream>
 #include <map>
 #include <set>
+#include <cmath>
+
 using namespace std;
 
-vector<int> solution(vector<string> v) {
-	vector<int> answer;
-	set<string> s;
-	map<string, int> m;
+vector<int> solution(int n, vector<string> words) {
+	map<int, int> person;
+	map<string, bool> wb;
+	vector<int> v;
+	bool flag = false;
 
-	for (int i = 0; i < v.size(); i++) {
-		s.insert(v[i]);
+	
+
+	//각 사람이 몇번째인지 기록한 맵
+	for (int i = 1; i <= n; i++) {
+		person.insert(make_pair(i, 0));
 	}
 
-	int left = 0;
-	int right = 0;
-	int ax, ay;//최종 답
-	int dif = v.size() + 100;
+	//예외 처리
+	if (words[0].size() == 1) {
+		v.push_back(1);
+		v.push_back(1);
+		return v;
+	}
 
-	//이중 loop가 없음
-	while (left <= right) {
-		if (right == v.size()) {
-			if (m.size() == s.size()) {
-				if (right - left < dif) {
-					dif = right - left;
-					ax = left + 1, ay = right;
-				}
-			}
-			else break;
+	wb.insert(make_pair(words[0], true));
+	person[1]++;
+	for (int i = 1; i < words.size(); i++) {
+		string before = words[i - 1];
+		string current = words[i];
+		if (wb.find(current) == wb.end() && before[before.length() - 1] == current[0] && current.size() > 1) {
+			person[(i + 1)%n]++;
+			wb.insert(make_pair(current,true));
 		}
-
-		if (m.size() < s.size()){
-			if (m.find(v[right]) != m.end()) {
-				m[v[right]]++;
-			}
-			else {
-				m.insert(make_pair(v[right], 1));
-			}
-			right += 1;
+		else {
+			flag = true;
+			v.push_back((i + 1) % n);//몇번째 사람
+			v.push_back(++person[(i + 1) % n]);//몇번째 차례
 		}
-
-		if (m.size() == s.size()) {
-			if (right - left < dif) {
-				dif = right - left;
-				ax = left + 1, ay = right;
-			}
-
-			int k = --m[v[left]];
-			if (k == 0) m.erase(v[left]);
-			left += 1;
-		}
-	}//while
-
-	answer.push_back(ax);
-	answer.push_back(ay);
-	return answer;
+	}
+	
+	if (flag==true && v.empty()){
+		v.push_back(0);
+		v.push_back(0);
+	}
+	return v;
 }
 
 int main() {
-	ios::sync_with_stdio(false);
-	cin.tie(NULL);
-	cout.tie(NULL);
-
 	int n;
 	cin >> n;
 	vector<string> v;
 	for (int i = 0; i < n; i++) {
-		string s;
-		cin >> s;
-		v.push_back(s);
+		string x;
+		cin >> x;
+		v.push_back(x);
 	}
-	vector<int> ans = solution(v);
+	vector<int> ans = solution(n,v);
 	cout << ans[0] << ' ' << ans[1];
 	return 0;
 }
