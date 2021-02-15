@@ -11,164 +11,109 @@
 #include <set>
 using namespace std;
 
-struct pa {
-	int x;
-	int y;
-};
-
-int Map[55][55];
-bool check[55][55];
-int D[55][55];
-int M = 987654321;
-int n, m;
-
-int wallCount = 0;
-int virusCount = 0;
-int nullCount = 0;
-
-bool flag = 0;
-int dx[4] = { -1,1,0,0 };
-int dy[4] = { 0,0,-1,1 };
-int Min = 987654321;
-
-vector<pa> v;
-vector<pa> non_active_virus;
-
-bool check_member(pa k, vector<pa> v) {
-	for(int i=0;i<v.size();i++){
-		if (k.x==v[i].x && k.y==v[i].y)
-			return true;
-	}
-	return false;
+int StringToInt(string s) {
+    int k = 1;
+    int num = 0;
+    for (int i = s.length()-1; i >= 0; i--) {
+        num += (s[i] - '0')*k;
+        k *= 10;
+    }
+    return num;
 }
 
-bool whereVirus(int x, int y) {
-	for (int i = 0; i < v.size(); i++) {
-		if (x == v[i].x && y == v[i].y) {
-			return true;
-		}
-	}
-	return false;//바이러스 위치가 아님
-}
+string solution(string s) {
+    string answer = "";
+    vector<int> v;
+    bool minus_flag = false;
+    string tmp = "";
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] == '-') {
+            if (minus_flag == false) {
+                minus_flag = true;
+            }
+        }
+        else if(s[i]==' '){
+            if (minus_flag == true) {
+                v.push_back(-StringToInt(tmp));
+                minus_flag = false;
+                tmp = "";
+            }
+            else {
+                v.push_back(StringToInt(tmp));
+                tmp = "";
+            }
+        }
+        else {
+            tmp += s[i];
+        }
+    }
+    if (minus_flag == true) {
+        v.push_back(-StringToInt(tmp));
+        minus_flag = false;
+    }
+    else {
+        v.push_back(StringToInt(tmp));
+    }
 
-void bfs(queue<pa> q, int cnt);
+    sort(v.begin(), v.end());
 
-void dfs(vector<pa>& tmp, int x, int cnt) {
-	if (tmp.size() == m) {
-		memset(D, 0, sizeof(D));
-		memset(check, false, sizeof(check));
-		queue<pa> q;
+    /*vector<int> Min;
+    vector<int> Max;
+    string tmp_1 = "";
+    string tmp_2 = "";
+    int a = v.front();
+    int b = v.back();
+    
+    if (a == 0) {
+        tmp_1 += '0';
+    }
+    if (b == 0) {
+        tmp_2 += '0';
+    }
 
-		for (int i = 0; i < v.size(); i++) {
-			if (check_member(v[i], tmp)) {
-				//활성 바이러스
-				q.push(v[i]);
-				check[v[i].x][v[i].y] = true;
-			}
-			else {
-				non_active_virus.push_back(v[i]);
-			}
-		}
-		bfs(q, cnt);
-		return;
-	}
+    while (abs(a) > 0) {
+        Min.push_back(a % 10);
+        a /= 10;
+    }
+    while (abs(b) > 0) {
+        Max.push_back(b % 10);
+        b /= 10;
+    }
+        
+    reverse(Min.begin(), Min.end());
+    reverse(Max.begin(), Max.end());
 
-	for (int i = x; i < v.size(); i++) {
-		tmp.push_back(v[i]);
-		dfs(tmp, i + 1, cnt);
-		tmp.pop_back();
-	}
-}
-
-void bfs(queue<pa>q ,int cnt) {
-	while (!q.empty()) {
-		pa cur = q.front();
-		q.pop();
-
-		for (int i = 0; i < 4; i++) {
-			int nx = cur.x + dx[i];
-			int ny = cur.y + dy[i];
-
-			if (nx < 0 || nx >= n || ny < 0 || ny >= n)
-				continue;
-
-			if (check_member(pa{ nx,ny }, non_active_virus)){
-				if (check[nx][ny] == false) {
-					check[nx][ny] = true;
-					q.push(pa{ nx,ny });
-					D[nx][ny] = D[cur.x][cur.y];
-				}
-			}
-			else {
-				if (check[nx][ny] == false && Map[nx][ny] == 0) {
-					check[nx][ny] = true;
-					q.push(pa{ nx,ny });
-					D[nx][ny] = D[cur.x][cur.y] + 1;
-					cnt++;
-				}
-			}
-		}
-	}
-
-	//활성이든 비활성이든 구분하지않고 전부 0으로 바꿈
-	for (int i = 0; i < v.size(); i++) {
-		D[v[i].x][v[i].y] = 0;
-	}
-
-	int k = -1;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			if (k < D[i][j] && !whereVirus(i, j)) {
-				k = D[i][j];
-			}
-		}
-	}
-
-	if (cnt == n * n - wallCount) {
-		flag = 1;//바이러스가 모든 빈칸에 퍼졌다는 것
-		Min = min(Min, k);
-	}
+    for (int i = 0; i < Min.size(); i++) {
+        int t = Min[i];
+        if (t < 0) {
+            tmp_1 += '-';
+            tmp_1 += char(abs(t)+48);
+        }
+        else {
+            tmp_1 += char(t + 48);
+        }
+    }
+    for (int i = 0; i < Max.size(); i++) {
+        int t = Max[i];
+        if (t < 0) {
+            tmp_2 += '-';
+            tmp_2 += char(abs(t) + 48);
+        }
+        else {
+            tmp_2 += char(t + 48);
+        }
+    }*/
+    answer = to_string(v.front()) + ' ' + to_string(v.back());
+    return answer;
 }
 
 int main() {
-	ios::sync_with_stdio(false);
-	cin.tie(0);
-	cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
 
-	cin >> n >> m;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cin >> Map[i][j];
-
-			if (Map[i][j] == 2) {
-				v.push_back(pa{ i,j });
-				virusCount++;
-			}
-
-			if (Map[i][j] == 0) {
-				nullCount++;
-			}
-
-			if (Map[i][j] == 1) {
-				wallCount++;
-			}
-		}
-	}
-
-	if (nullCount == 0 && virusCount >= 1) {
-		cout << 0;
-		return 0;
-	}
-
-	vector<pa> tmp;
-	dfs(tmp, 0, virusCount);
-
-	if (flag == 1) {
-		cout << Min;
-	}
-	else if (flag == 0) {
-		cout << -1;
-	}
-
-	return 0;
+    string k;
+    getline(cin, k);
+    cout << solution(k);
+    return 0;
 }
